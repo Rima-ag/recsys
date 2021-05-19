@@ -33,6 +33,7 @@ public class ItemFiltering {
     }
 
     private void initMatrix(){
+
         userRating = new double[totalMovies];
         itemMatrix = new double[totalMovies][totalUsers];
     }
