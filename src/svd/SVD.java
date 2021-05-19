@@ -28,7 +28,7 @@ public class SVD extends RecommenderSystem {
         V = svd.getV();
         this.setDimension(svd.getSingularValues());
         RealMatrix q = new Array2DRowRealMatrix(userRating).transpose();
-        qConcept = q.multiply(V);
+        qConcept = q.multiply(V); //pas terminer
     }
 
     private void fillArray(double[] array){
