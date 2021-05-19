@@ -1,14 +1,11 @@
 package item;
 
+import RecommenderSystem.RecommenderSystem;
+
 import java.io.File;
 import java.util.Scanner;
 
-public class ItemFiltering {
-
-    private String filename = "data";
-
-    private int totalUsers = 5;
-    private int totalMovies = 5;
+public class ItemFiltering extends RecommenderSystem {
 
     private int userId;
     private double[] userRating;
@@ -41,7 +38,7 @@ public class ItemFiltering {
     private void fillMatrix(){
         try {
             Integer lineNumber = 1;
-            Scanner sc = new Scanner(new File("data"));
+            Scanner sc = new Scanner(new File(filename));
             while (sc.hasNextLine()) {
                 if(lineNumber == 1) {
                     sc.nextLine();
