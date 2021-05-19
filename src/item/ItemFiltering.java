@@ -11,13 +11,13 @@ public class ItemFiltering {
     private int totalMovies = 5;
 
     private int userId;
-    private int[] userRating;
+    private double[] userRating;
 
     private int movieId;
     private double movieModule;
-    private int[] movieRating;
+    private double[] movieRating;
 
-    private int[][] itemMatrix;
+    private double[][] itemMatrix;
 
     private double[] itemSimilarity;
 
@@ -33,8 +33,8 @@ public class ItemFiltering {
     }
 
     private void initMatrix(){
-        userRating = new int[totalMovies];
-        itemMatrix = new int[totalMovies][totalUsers];
+        userRating = new double[totalMovies];
+        itemMatrix = new double[totalMovies][totalUsers];
     }
 
     private void fillMatrix(){
@@ -62,6 +62,8 @@ public class ItemFiltering {
                 Integer movie = Integer.parseInt(line[1]);
                 Integer rating = Integer.parseInt(line[2]);
                 itemMatrix[movie][user]= rating;
+                if(user == userId)
+                    userRating[movie] = rating;
                 ++lineNumber;
             }
         }catch(Exception e){
@@ -75,8 +77,9 @@ public class ItemFiltering {
         double avg;
 
         for(int r = 0; r < totalMovies; ++r){
-
-            int[] movie = itemMatrix[r];
+            sum = 0;
+            totalRatings = 0;
+            double[] movie = itemMatrix[r];
 
             for(int user = 0; user < totalUsers; ++user){
                 if(movie[user]!= 0){
@@ -91,61 +94,51 @@ public class ItemFiltering {
                     movie[user] -= avg;
                 }
             }
-            userRating[r] = movie[userId];
         }
         movieRating = itemMatrix[movieId];
     }
 
     private void computeSimilarity(){
         itemSimilarity = new double[totalMovies];
-        for(int i = 0; i < totalUsers; ++i){
-            movieModule += movieRating[i];
-        }
-        movieModule = Math.sqrt(movieModule);
-        double dotProduct = 0;
-        double normOfSecondItem = 0;
+
         for(int r = 0; r < totalMovies; ++r){
+            double dotProduct = 0;
+            double normOfSecondItem = 0;
             if(r == movieId)
                 continue;
             if(userRating[r] == 0)
                 continue;
-            int[] movie = itemMatrix[r];
+            double[] movie = itemMatrix[r];
             for(int user = 0; user < totalUsers; ++user){
                 if(movieRating[user] != 0 && movie[user] != 0){
                     dotProduct += movieRating[user] * movie[user];
                     normOfSecondItem += movie[user] * movie[user];
+                    movieModule += movieRating[user] * movieRating[user];
                 }
             }
-            itemSimilarity[r] = dotProduct / (Math.sqrt(normOfSecondItem) * movieModule);
+            itemSimilarity[r] = dotProduct / (Math.sqrt(normOfSecondItem) * Math.sqrt(movieModule));
         }
     }
 
     private void generateRating(){
-        int imax1 = 0;
-        double vmax1 = itemSimilarity[0];
-        int imax2 = 1;
-        double vmax2 = itemSimilarity[1];
+        double sum = 0;
+        double top = 0;
         for(int i = 0; i < itemSimilarity.length; ++i){
-            if(i != imax1 && i != imax2){
-                if(vmax1 < itemSimilarity[i]){
-                    imax2 = imax1;
-                    vmax2 = vmax1;
-                    imax1 = i;
-                    vmax1 = itemSimilarity[i];
-                }else if(vmax2 < itemSimilarity[i]){
-                    imax2 = i;
-                    vmax2 = itemSimilarity[i];
-                }
+            if(itemSimilarity[i] > 0){
+                top += userRating[i] * itemSimilarity[i];
+                sum += itemSimilarity[i];
             }
         }
+        if(sum == 0){
+            System.out.println("No similar items found");
+        }else
         System.out.println("Predicted rating : " +
-                (userRating[imax1] * itemSimilarity[imax1] + userRating[imax2] * itemSimilarity[imax2])
-                        / (itemSimilarity[imax1] + itemSimilarity[imax2]));
+                top/sum);
     }
 
 
     public static void main(String[] args){
-        ItemFiltering filter = new ItemFiltering(0,1);
+        ItemFiltering filter = new ItemFiltering(5,2);
     }
 
 }
