@@ -1,94 +1,57 @@
 package item;
 
-import RecommenderSystem.RecommenderSystem;
-
-import java.io.File;
-import java.util.Scanner;
+import RecommenderSystem.*;
 
 public class ItemFiltering extends RecommenderSystem {
-
-    private int userId;
-    private double[] userRating;
-
-    private int movieId;
     private double movieModule;
-    private double[] movieRating;
-
     private double[][] itemMatrix;
-
     private double[] itemSimilarity;
 
-    public ItemFiltering(Integer userId, Integer movieId){
+    public ItemFiltering(int userId, int movieId) {
+        super(userId, movieId);
+    }
 
-        this.userId = userId;
-        this.movieId = movieId;
-
-        fillMatrix();
+    @Override
+    public void getRatings() {
+        readDataSet();
         normalizeMatrix();
         computeSimilarity();
         generateRating();
     }
 
-    private void initMatrix(){
+    @Override
+    protected void setMatrixValue(int user, int movie, int rating) {
+        itemMatrix[movie][user] = rating;
+        if (user == userId)
+            userRating[movie] = rating;
+    }
 
+    @Override
+    protected void initMatrix() {
         userRating = new double[totalMovies];
         itemMatrix = new double[totalMovies][totalUsers];
     }
 
-    private void fillMatrix(){
-        try {
-            Integer lineNumber = 1;
-            Scanner sc = new Scanner(new File(filename));
-            while (sc.hasNextLine()) {
-                if(lineNumber == 1) {
-                    sc.nextLine();
-                    ++lineNumber;
-                    continue;
-                }else if(lineNumber == 2) {
-                    String[] line = sc.nextLine().split("-");
-                    totalUsers = Integer.parseInt(line[0]);
-                    totalMovies = Integer.parseInt(line[1]);
-
-                    initMatrix();
-                    ++lineNumber;
-                    continue;
-                }
-                String[] line = sc.nextLine().split(",");
-                if(line.length != 3)
-                    throw new Exception("Wrong format");
-                Integer user = Integer.parseInt(line[0]);
-                Integer movie = Integer.parseInt(line[1]);
-                Integer rating = Integer.parseInt(line[2]);
-                itemMatrix[movie][user]= rating;
-                if(user == userId)
-                    userRating[movie] = rating;
-                ++lineNumber;
-            }
-        }catch(Exception e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private void normalizeMatrix(){
+    private void normalizeMatrix() {
         double totalRatings = 0;
         double sum = 0;
         double avg;
 
-        for(int r = 0; r < totalMovies; ++r){
+        for (int r = 0; r < totalMovies; ++r) {
             sum = 0;
             totalRatings = 0;
             double[] movie = itemMatrix[r];
 
-            for(int user = 0; user < totalUsers; ++user){
-                if(movie[user]!= 0){
+            for (int user = 0; user < totalUsers; ++user) {
+                if (movie[user] != 0) {
                     sum += movie[user];
                     ++totalRatings;
                 }
             }
             avg = sum / totalRatings;
 
-            for(int user = 0; user < totalUsers; ++user){
-                if(movie[user]!= 0){
+            for (int user = 0; user < totalUsers; ++user) {
+                if (movie[user] != 0) {
                     movie[user] -= avg;
                 }
             }
@@ -96,19 +59,19 @@ public class ItemFiltering extends RecommenderSystem {
         movieRating = itemMatrix[movieId];
     }
 
-    private void computeSimilarity(){
+    private void computeSimilarity() {
         itemSimilarity = new double[totalMovies];
 
-        for(int r = 0; r < totalMovies; ++r){
+        for (int r = 0; r < totalMovies; ++r) {
             double dotProduct = 0;
             double normOfSecondItem = 0;
-            if(r == movieId)
+            if (r == movieId)
                 continue;
-            if(userRating[r] == 0)
+            if (userRating[r] == 0)
                 continue;
             double[] movie = itemMatrix[r];
-            for(int user = 0; user < totalUsers; ++user){
-                if(movieRating[user] != 0 && movie[user] != 0){
+            for (int user = 0; user < totalUsers; ++user) {
+                if (movieRating[user] != 0 && movie[user] != 0) {
                     dotProduct += movieRating[user] * movie[user];
                     normOfSecondItem += movie[user] * movie[user];
                     movieModule += movieRating[user] * movieRating[user];
@@ -118,25 +81,20 @@ public class ItemFiltering extends RecommenderSystem {
         }
     }
 
-    private void generateRating(){
+    private void generateRating() {
         double sum = 0;
         double top = 0;
-        for(int i = 0; i < itemSimilarity.length; ++i){
-            if(itemSimilarity[i] > 0){
+        for (int i = 0; i < itemSimilarity.length; ++i) {
+            if (itemSimilarity[i] > 0) {
                 top += userRating[i] * itemSimilarity[i];
                 sum += itemSimilarity[i];
             }
         }
-        if(sum == 0){
+        if (sum == 0) {
             System.out.println("No similar items found");
-        }else
-        System.out.println("Predicted rating : " +
-                top/sum);
-    }
-
-
-    public static void main(String[] args){
-        ItemFiltering filter = new ItemFiltering(5,2);
+        } else
+            System.out.println("Predicted rating for Item-Item Filtering : " +
+                    top / sum);
     }
 
 }
