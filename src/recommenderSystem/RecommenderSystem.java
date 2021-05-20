@@ -1,6 +1,6 @@
-package RecommenderSystem;
+package recommenderSystem;
 
-import globalbaseline.GlobalBaseline;
+import globalBaseline.GlobalBaseline;
 import item.ItemFiltering;
 import svd.SVD;
 import user.UserFiltering;
@@ -31,7 +31,7 @@ public abstract class RecommenderSystem {
 
     protected abstract void initMatrix();
 
-    public abstract void getRatings();
+    public abstract void printRatings();
 
     protected void readDataSet() {
         try {
@@ -64,6 +64,7 @@ public abstract class RecommenderSystem {
             System.out.println(e.getMessage());
         }
     }
+
     public static void main(String[] args) {
         double[] ratings = new double[6];
         ratings[0] = 5.0;
@@ -78,7 +79,7 @@ public abstract class RecommenderSystem {
         recommenderSystemList.add(new ItemFiltering(5, 2));
         recommenderSystemList.add(new SVD(ratings));
         for (RecommenderSystem e: recommenderSystemList) {
-            e.getRatings();
+            e.printRatings();
         }
     }
 }

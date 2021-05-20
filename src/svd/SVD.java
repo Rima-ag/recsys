@@ -1,6 +1,6 @@
 package svd;
 
-import RecommenderSystem.RecommenderSystem;
+import recommenderSystem.RecommenderSystem;
 import org.apache.commons.math3.linear.*;
 
 public class SVD extends RecommenderSystem {
@@ -15,7 +15,7 @@ public class SVD extends RecommenderSystem {
     }
 
     @Override
-    public void getRatings() {
+    public void printRatings() {
         this.readDataSet();
         this.generateRating();
         //ratings should be printed when work is done here
@@ -30,6 +30,8 @@ public class SVD extends RecommenderSystem {
     protected void initMatrix() {
         movieUserMatrix = new double[totalUsers][totalMovies];
     }
+
+
 
     public void generateRating() {
         RealMatrix A = new Array2DRowRealMatrix(movieUserMatrix);

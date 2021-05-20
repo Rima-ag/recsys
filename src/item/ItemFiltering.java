@@ -1,22 +1,14 @@
 package item;
 
-import RecommenderSystem.*;
+import recommenderSystem.*;
 
-public class ItemFiltering extends RecommenderSystem {
+public class ItemFiltering extends CollaborativeFiltering {
     private double movieModule;
     private double[][] itemMatrix;
     private double[] itemSimilarity;
 
     public ItemFiltering(int userId, int movieId) {
         super(userId, movieId);
-    }
-
-    @Override
-    public void getRatings() {
-        readDataSet();
-        normalizeMatrix();
-        computeSimilarity();
-        generateRating();
     }
 
     @Override
@@ -32,7 +24,8 @@ public class ItemFiltering extends RecommenderSystem {
         itemMatrix = new double[totalMovies][totalUsers];
     }
 
-    private void normalizeMatrix() {
+    @Override
+    protected void normalizeMatrix() {
         double totalRatings = 0;
         double sum = 0;
         double avg;
@@ -59,7 +52,8 @@ public class ItemFiltering extends RecommenderSystem {
         movieRating = itemMatrix[movieId];
     }
 
-    private void computeSimilarity() {
+    @Override
+    protected void computeSimilarity() {
         itemSimilarity = new double[totalMovies];
 
         for (int r = 0; r < totalMovies; ++r) {
@@ -81,7 +75,8 @@ public class ItemFiltering extends RecommenderSystem {
         }
     }
 
-    private void generateRating() {
+    @Override
+    protected void generateRating() {
         double sum = 0;
         double top = 0;
         for (int i = 0; i < itemSimilarity.length; ++i) {

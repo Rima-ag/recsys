@@ -1,6 +1,6 @@
-package globalbaseline;
+package globalBaseline;
 
-import RecommenderSystem.RecommenderSystem;
+import recommenderSystem.RecommenderSystem;
 
 public class GlobalBaseline extends RecommenderSystem {
     private int sumOfRatings = 0;
@@ -14,7 +14,7 @@ public class GlobalBaseline extends RecommenderSystem {
     }
 
     @Override
-    public void getRatings() {
+    public void printRatings() {
         readDataSet();
         computeMean();
         predict();
@@ -49,7 +49,6 @@ public class GlobalBaseline extends RecommenderSystem {
             }
         }
         movieToBaseline = (movieToBaseline / count) - globalMean;
-
 
         count = 0;
         for (int i = 0; i < totalMovies; ++i) {
